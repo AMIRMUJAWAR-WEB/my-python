@@ -1,39 +1,37 @@
 pipeline {
     agent agent1
 
-    environment {
-        IMAGE = https://github.com/AMIRMUJAWAR-WEB/my-python.git
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
-                git url: 'https://YOUR-REPO-URL.git', branch: 'main'
+                git url: 'https://github.com/AMIRMUJAWAR-WEB/your-python-repo.git', branch: 'main'
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE .'
+                    dockerImage = docker.build("my-python-app")
                 }
             }
         }
 
-        stage('Login to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Image') {
+        stage('Run Container') {
             steps {
                 script {
-                    sh 'docker push $IMAGE'
+                    // Stop any existing container first
+                    sh 'docker rm -f my-python-container || true'
+
+                    // Run new container
+                    sh 'docker run -d --name my-python-container -p 8000:8000 my-python-app'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed!"
         }
     }
 }
