@@ -2,7 +2,7 @@ pipeline {
     agent agent1
 
     environment {
-        IMAGE = "yourdockerhubusername/my-python-app"
+        IMAGE = https://github.com/AMIRMUJAWAR-WEB/my-python.git
     }
 
     stages {
